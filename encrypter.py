@@ -6,18 +6,17 @@ from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
 from cryptography.fernet import Fernet
+import time 
 
 # importing system modules 
 import os
 import base64
 
-# some raw data to fetch for testing
-password = "Pyth0nHack3r24"
-private_key = "simplicity_is_the_best_sofastication"
 
 def encrypt(private_key, password):
 
     # Derive a secure encryption key using PBKDF2 with the salt
+    start_time = time.time()
     salt = os.urandom(16)
     kdf = PBKDF2HMAC(
         algorithm=hashes.SHA256(),
@@ -31,6 +30,10 @@ def encrypt(private_key, password):
     # Encrypt the private key with the derived key
     fernet = Fernet(key)
     encrypted_key = fernet.encrypt(private_key.encode())
+    end_time = time.time()
+    execution_time_ms = (end_time - start_time) * 1000
+
+    print(f"Function took {execution_time_ms:.2f} milliseconds to run.")
 
     return salt, encrypted_key
 
@@ -51,11 +54,4 @@ def decrypt(encrypted_key, salt, password):
     decrypted_key = fernet.decrypt(encrypted_key).decode()
     return decrypted_key
 
-print("Get the encryted value: ")
-salt, encrypted_key = encrypt(private_key, password)
-print(encrypted_key.decode())
-
-print("Decrpyted value: ")
-decrypted_key = decrypt(encrypted_key, salt, password)
-print(decrypted_key)
 
